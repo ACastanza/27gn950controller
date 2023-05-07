@@ -22,7 +22,6 @@ class Gui(QWidget):
         super().__init__()
         self.init_ui()
 
-
     def init_ui(self):
         self.setWindowTitle('lg-x-g950-controller')
 
@@ -213,6 +212,7 @@ app = QApplication(sys.argv)
 try:
     x = Gui()
     x.init_monitors()
+    x.run_lightsync_prismatic()
     x.show()
     sys.exit(app.exec_())
 finally:
