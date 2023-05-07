@@ -9,6 +9,8 @@ import hid
 
 import re
 import sys
+import pystray
+from PIL import Image
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -21,8 +23,6 @@ class Gui(QWidget):
     def __init__(self):
         super().__init__()
         self.init_ui()
-        self.run_lightsync_prismatic()
-
 
     def init_ui(self):
         self.setWindowTitle('lg-x-g950-controller')
@@ -210,12 +210,33 @@ class Gui(QWidget):
             except Exception as e:
                 print(e)
 
+    def create_tray_icon(self):
+        icon = Image.open("./rgb.ico")
+        menu = pystray.Menu(
+            pystray.MenuItem("Open", self.show_window),
+            pystray.MenuItem("Exit", self.exit_application)
+        )
+        self.tray_icon = pystray.Icon("lg-x-g950-controller", icon, "lg-x-g950-controller", menu)
+        self.tray_icon.run()
+
+    def show_window(self):
+        self.setWindowState(self.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        self.show()
+
+    def exit_application(self):
+        self.tray_icon.stop()
+        QApplication.quit()
+        self.cleanup()
+        sys.exit(app.exec_())
+
 app = QApplication(sys.argv)
 try:
     x = Gui()
     x.init_monitors()
     x.run_lightsync_prismatic()
-    x.show()
+    x.create_tray_icon()
+    x.setWindowIcon(QIcon('./rgb.ico'))
+
     sys.exit(app.exec_())
 finally:
     if 'x' in locals():
